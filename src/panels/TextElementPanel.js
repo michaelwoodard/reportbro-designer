@@ -8,6 +8,7 @@ import DocElement from '../elements/DocElement';
 import TableTextElement from '../elements/TableTextElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
+import Parameter from "../data/Parameter";
 
 /**
  * Panel to edit all text properties.

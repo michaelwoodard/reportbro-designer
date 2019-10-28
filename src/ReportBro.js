@@ -517,17 +517,23 @@ export default class ReportBro {
         // when there are no data source parameters available (due to search filter)
         let dataSourceIndex = 0;
         let dataSources = [];
+
+        let isSection = obj.getPanelItem().getParent().getPanelName() === 'section_band';
+
         if (obj instanceof DocElement) {
             obj.getAllDataSources(dataSources, null);
             for (let dataSource of dataSources) {
                 if (dataSource.parameters.length > 0) {
                     parameters.push({
                         separator: true, separatorClass: 'rbroParameterDataSourceGroup', id: 'ds' + dataSourceIndex,
-                        name: this.getLabel('parametersDataSource')
+                        name: this.getLabel('parametersDataSource') + ' - (' + dataSource.name + ')'
                     });
                     dataSourceIndex++;
                     for (let dataSourceParameter of dataSource.parameters) {
-                        dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                        if (!isSection)
+                            dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                        else
+                            dataSourceParameter.appendSectionParameterItems(parameters, Object.values(Parameter.type), dataSource.name);
                     }
                 }
             }

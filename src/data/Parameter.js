@@ -333,6 +333,100 @@ export default class Parameter {
     }
 
     /**
+     * In case of section map parameter all child parameters are appended, for other parameter types the
+     * parameter itself is appended. Parameters with type array are only added if explicitly
+     * specified in allowedTypes parameter.
+     * Used for parameter popup window.
+     * @param {Object[]} parameters - list where parameter items will be appended to.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
+     * parameter list. If not set all parameter types are allowed.
+     */
+    appendSectionParameterItems(parameters, allowedTypes, sectionName) {
+
+        function fullyQualifiedName(child, stopNode) {
+            let hierarchy = new Array();
+            let fqn = '';
+            let parent = child.getParent();
+            while (parent) {
+                hierarchy.push(parent.name + '.');
+                if (parent === undefined || parent.name === stopNode)
+                    break;
+
+                parent = parent.getParent();
+            }
+            if (hierarchy.length > 0) {
+                hierarchy.reverse();
+                for (let i = 0; i < hierarchy.length; i++) {
+                    fqn += hierarchy[i];
+                }
+            }
+            return fqn;
+        }
+
+        switch (this.type) {
+            case Parameter.type.map:
+                let parametersToAppend = [];
+                if (Array.isArray(allowedTypes)) {
+                    for (let child of this.getChildren()) {
+                        if (allowedTypes.indexOf(child.type) !== -1) {
+                            parametersToAppend.push(child);
+                        }
+                    }
+                } else {
+                    parametersToAppend = this.getChildren();
+                }
+                if (parametersToAppend.length > 0) {
+                    if (this.getParent())
+                        parameters.push({
+                            separator: true, id: this.id,
+                            separatorClass: 'rbroParameterGroup', name: this.getParent().name + '.' + this.name });
+                    else
+                        parameters.push({
+                            separator: true, id: this.id,
+                            separatorClass: 'rbroParameterGroup', name: this.name });
+                }
+                for (let parameter of parametersToAppend) {
+                    parameter.appendSectionParameterItems(parameters, allowedTypes, sectionName);
+                }
+                break;
+            case Parameter.type.array:
+                let children = this.getChildren();
+                if (children) {
+                    parameters.push({
+                        separator: true, id: this.id,
+                        separatorClass: 'rbroParameterGroup', name: this.name });
+
+                    for (let child of children) {
+                        child.appendSectionParameterItems(parameters, [Parameter.type.boolean, Parameter.type.average, Parameter.type.date, Parameter.type.number, Parameter.type.string, Parameter.type.sum], sectionName);
+                        let babies = child.getChildren();
+                        if (babies) {
+                            for (let baby of babies) {
+                                baby.appendSectionParameterItems(parameters, allowedTypes, sectionName);
+                            }
+                        }
+                    }
+                }
+                else {
+                    // add array parameter only if explicitly specified in allowedTypes
+                    parameters.push({
+                        name: this.name, nameLowerCase: this.name.toLowerCase(),
+                        id: this.id, description: '' });
+                }
+                break;
+            default:
+                let name = fullyQualifiedName(this, sectionName) + this.name;
+                let dup = parameters.find(function(element) {
+                    return element.name === name;
+                });
+                if (dup === undefined) {
+                    parameters.push({
+                        name: name, nameLowerCase: name.toLowerCase(),
+                        id: this.id, description: '' });
+                }
+        }
+    }
+
+    /**
      * Appends field parameters of array parameter.
      * Used for parameter popup window of sum/average expression field.
      * @param {Object[]} parameters - list where parameter items will be appended to.
