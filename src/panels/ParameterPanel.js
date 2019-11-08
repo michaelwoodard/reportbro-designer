@@ -398,20 +398,20 @@ export default class ParameterPanel {
             $('#rbro_parameter_expression_row').hide();
         }
         // do not allow nested array/map
-        if (obj.getPanelItem() !== null && obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem()) {
-            $('#rbro_parameter_type option[value="array"]').removeClass('rbroHidden');
-            $('#rbro_parameter_type option[value="map"]').removeClass('rbroHidden');
-        } else {
-            $('#rbro_parameter_type option[value="array"]').addClass('rbroHidden');
-            $('#rbro_parameter_type option[value="map"]').addClass('rbroHidden');
-        }
+        // if (obj.getPanelItem() !== null && obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem()) {
+        //     $('#rbro_parameter_type option[value="array"]').removeClass('rbroHidden');
+        //     $('#rbro_parameter_type option[value="map"]').removeClass('rbroHidden');
+        // } else {
+        //     $('#rbro_parameter_type option[value="array"]').addClass('rbroHidden');
+        //     $('#rbro_parameter_type option[value="map"]').addClass('rbroHidden');
+        // }
         // do not allow image and sum/average parameter in list
         if (parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) {
-            $('#rbro_parameter_type option[value="image"]').addClass('rbroHidden');
+            //$('#rbro_parameter_type option[value="image"]').addClass('rbroHidden');
             $('#rbro_parameter_type option[value="sum"]').addClass('rbroHidden');
             $('#rbro_parameter_type option[value="average"]').addClass('rbroHidden');
         } else {
-            $('#rbro_parameter_type option[value="image"]').removeClass('rbroHidden');
+            //$('#rbro_parameter_type option[value="image"]').removeClass('rbroHidden');
             $('#rbro_parameter_type option[value="sum"]').removeClass('rbroHidden');
             $('#rbro_parameter_type option[value="average"]').removeClass('rbroHidden');
         }

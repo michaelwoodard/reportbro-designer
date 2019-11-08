@@ -80,7 +80,7 @@ export default class ReportBro {
                 { name: '$ #,##0.00', description: this.locale['patternNumber5'] }
             ],
             reportServerTimeout: 20000,
-            reportServerUrl: 'https://www.reportbro.com/report/run',
+            reportServerUrl: 'http://localhost:5000/report/run',
             reportServerUrlCrossDomain: false
         };
         if (properties) {
@@ -519,6 +519,8 @@ export default class ReportBro {
         let dataSources = [];
 
         let isSection = obj.getPanelItem().getParent().getPanelName() === 'section_band';
+        let isTable = obj.getPanelItem().panelName === 'table';
+        let isTableElement = obj.getPanelItem().getParent().getPanelName() == 'table_band';
 
         if (obj instanceof DocElement) {
             obj.getAllDataSources(dataSources, null);
@@ -530,8 +532,10 @@ export default class ReportBro {
                     });
                     dataSourceIndex++;
                     for (let dataSourceParameter of dataSource.parameters) {
-                        if (!isSection)
+                        if (!isSection && !isTable && !isTableElement)
                             dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                        else if (isTable && !isTableElement)
+                            dataSourceParameter.appendParameterItems(parameters, [Parameter.type.array]);
                         else
                             dataSourceParameter.appendSectionParameterItems(parameters, Object.values(Parameter.type), dataSource.name);
                     }
